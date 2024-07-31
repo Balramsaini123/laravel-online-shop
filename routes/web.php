@@ -9,7 +9,9 @@ use App\Http\Controllers\admin\ProductImageController;
 use App\Http\Controllers\admin\ProductSubcategoryController;
 use App\Http\Controllers\admin\SubCategoryController;
 use App\Http\Controllers\admin\TempImagesController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\FrontController;
+use App\Http\Controllers\ShopController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -27,6 +29,10 @@ use Illuminate\Support\Str;
 
 
 Route::get("/", [FrontController::class,'index'])->name('front.home');
+Route::get("/shop/{categorySlug?}/{subCategorySlug?}", [ShopController::class,'index'])->name('front.shop');
+Route::get('/product/{slug}', [ShopController::class,'product'])->name('front.product');
+Route::get("/cart", [CartController::class,'cart'])->name('front.cart');
+Route::post("/add-to-cart", [CartController::class,'addToCart'])->name('front.addToCart');
 
 Route::get('/admin/login', [AdminLoginController::class,'index'])->name('admin.login');
 Route::post('/admin/login', [AdminLoginController::class,'login'])->name('admin.login.submit');
@@ -69,6 +75,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/products/{product}/edit',[ProductController::class,'edit'])->name('products.edit');
     Route::put('/products/{product}',[ProductController::class,'update'])->name('products.update');
     Route::delete('/products/{id}',[ProductController::class,'destroy'])->name('products.delete');
+    Route::get('/get-products', [ProductController::class, 'getProducts'])->name('products.getProducts');
+
 
     Route::get('/product-subcategories',[ProductSubcategoryController::class,'index'])->name('product-subcategories.index');
     Route::post('product-images/update', [ProductImageController::class, 'update'])->name('product-images.update');
