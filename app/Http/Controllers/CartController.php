@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Product;
 use Gloudemans\Shoppingcart\Facades\Cart;
+use Illuminate\Support\Facades\Session;
 
 class CartController extends Controller
 {
@@ -57,5 +58,46 @@ class CartController extends Controller
 
         $cartContent = Cart::content();
         return view("front.cart", compact("categories","cartContent"));
+    }
+
+    public function updateCart(Request $request)
+    {
+        $rowId = $request->rowId;
+        $qty = $request->qty;
+
+        $itemInfo = Cart::get($rowId);
+        $product = Product::find($itemInfo->id);
+
+        if($product->track_qty == 'Yes'){
+            if($qty <= $product->qty){
+                Cart::update($rowId, $qty);
+                $message = 'Cart updated successfully';
+                $status = true;
+            }else{
+                $message = 'Out of stock';
+                $status = false;
+            }
+        }else{
+            Cart::update($rowId, $qty);
+            $message = 'Cart updated successfully';
+            $status = true;
+        }
+        
+        Session::flash('flashMessage', $message);
+
+        return response()->json([
+            'status' => $status,
+            'message' => $message,
+        ]);
+    }
+
+    public function deleteItem(Request $request)
+    {
+        Cart::remove($request->rowId);
+        
+        return response()->json([
+            'status' => true,
+            'message' => 'Item removed successfully',
+        ]);
     }
 }
