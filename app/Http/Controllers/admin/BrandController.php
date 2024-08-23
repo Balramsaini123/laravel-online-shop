@@ -13,10 +13,9 @@ class BrandController extends Controller
 {
     use JsonResponseTrait;
 
-    public $brandService;
-
-    public function __construct(BrandService $brandService){
-        $this->brandService = $brandService;
+    public function __construct(
+        protected BrandService $brandService
+    ){
     }
 
     public function index(BrandDataTable $dataTables){

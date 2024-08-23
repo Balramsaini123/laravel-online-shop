@@ -14,19 +14,10 @@ class SubCategoryController extends Controller
 {
     use JsonResponseTrait;
 
-    public $subCategoryService;
-    public $categoryService;
-
     public function __construct(
-
-        SubcategoryService $subCategoryService,
-        CategoryService $categoryService
-
-        ){
-
-        $this->subCategoryService = $subCategoryService;
-        $this->categoryService = $categoryService;
-
+        protected SubcategoryService $subCategoryService,
+        protected CategoryService $categoryService
+    ){
     }
 
     public function index(SubcategoryDataTable $dataTable){

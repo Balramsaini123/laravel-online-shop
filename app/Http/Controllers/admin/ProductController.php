@@ -16,25 +16,12 @@ class ProductController extends Controller
 {
     use JsonResponseTrait;
 
-    public $productService;
-    public $brandService;
-    public $categoryService;
-    public $subcategoryService;
-
     public function __construct(
-
-        ProductService $productService,
-        BrandService $brandService,
-        CategoryService $categoryService,
-        SubcategoryService $subcategoryService
-
-        ){
-
-        $this->productService = $productService;
-        $this->brandService = $brandService;
-        $this->categoryService = $categoryService;
-        $this->subcategoryService = $subcategoryService;
-
+        protected ProductService $productService,
+        protected BrandService $brandService,
+        protected CategoryService $categoryService,
+        protected SubcategoryService $subcategoryService
+    ){
     }
 
     public function index(ProductDataTable $dataTable){

@@ -8,10 +8,9 @@ use App\Services\ProductimageService;
 
 class ProductImageController extends Controller
 {
-    public $productImageService;
-
-    public function __construct(ProductimageService $productImageService){
-        $this->productImageService = $productImageService;
+    public function __construct(
+        protected ProductimageService $productImageService
+    ){
     }
 
     public function update(Request $request)

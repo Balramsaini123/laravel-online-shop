@@ -13,10 +13,9 @@ class CategoryController extends Controller
 {
     use JsonResponseTrait;
 
-    public $categoryService;
-
-    public function __construct(CategoryService $categoryService){
-        $this->categoryService = $categoryService;
+    public function __construct(
+        protected CategoryService $categoryService
+    ){
     }
 
     public function index(CategoryDataTable $dataTables){
