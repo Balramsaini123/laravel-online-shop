@@ -160,7 +160,7 @@
                                 <h2 class="h4  mb-3">Product category</h2>
                                 <div class="mb-3">
                                     <label for="category">Category</label>
-                                    <select name="category" id="category" class="form-control">
+                                    <select name="category_id" id="category" class="form-control">
                                         <option value="">Select a Category</option>
                                         @if ($categories->isNotEmpty())
                                             @foreach ($categories as $category)

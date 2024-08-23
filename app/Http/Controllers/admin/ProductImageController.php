@@ -4,58 +4,23 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\ProductImage;
-use Intervention\Image\Laravel\Facades\Image;
-use Illuminate\Support\Facades\File;
+use App\Services\ProductimageService;
 
 class ProductImageController extends Controller
 {
+    public $productImageService;
+
+    public function __construct(ProductimageService $productImageService){
+        $this->productImageService = $productImageService;
+    }
+
     public function update(Request $request)
     {
-        $image = $request->image;
-        $ext = $image->getClientOriginalExtension();
-        $sourcePath = $image->getPathName();
-
-        $productImage = new ProductImage();
-        $productImage->product_id = $request->product_id;
-        $productImage->image = 'NULL';
-        $productImage->save();
-
-        $imageName = $request->product_id . '-' . $productImage->id . '-' . time() . '.' . $ext;
-        $productImage->image = $imageName;
-        $productImage->save();
-
-        //Large Image
-        $destPath = public_path() . '/uploads/product/large/' . $imageName;
-        $image = Image::read($sourcePath);
-        $image->resize(1400, 933);
-        $image->save($destPath);
-
-        //Small Image
-        $destPath = public_path() . '/uploads/product/small/' . $imageName;
-        $image = Image::read($sourcePath);
-        $image->resize(300, 300);
-        $image->save($destPath);
-
-        return response()->json([
-            'status' => true,
-            'image_id' => $productImage->id,
-            'ImagePath' => asset('uploads/product/small/'.$productImage->image),
-            'message' => 'Image saved successfully',
-        ]);
+        return $this->productImageService->update($request);
     }
 
     public function destroy(Request $request)
     {
-        $productImage = ProductImage::find($request->id);
-
-        File::delete(public_path('uploads/product/large/'.$productImage->image));
-        File::delete(public_path('uploads/product/small/'.$productImage->image));
-        $productImage->delete();
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Image deleted successfully',
-        ]);
+        return $this->productImageService->delete($request);
     }
 }

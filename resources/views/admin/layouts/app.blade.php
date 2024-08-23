@@ -20,7 +20,15 @@
     <link rel="stylesheet" href="{{ asset('admin-assets/plugins/select2/css/select2.min.css') }}">
 
     <link rel="stylesheet" href="{{ asset('admin-assets/css/custom.css') }}">
+    
+     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+    
+     <!-- DataTables CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
+
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -88,6 +96,7 @@
         </footer>
 
     </div>
+    
     <!-- ./wrapper -->
     <!-- jQuery -->
     <script src="{{ asset('admin-assets/plugins/jquery/jquery.min.js') }}"></script>
@@ -120,6 +129,7 @@
             });
         });
     </script>
+
 
 
     @yield('customjs')

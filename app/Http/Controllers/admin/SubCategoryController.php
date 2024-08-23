@@ -2,23 +2,42 @@
 
 namespace App\Http\Controllers\admin;
 
+use App\DataTables\SubcategoryDataTable;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Category;
-use App\Models\SubCategory;
 use Illuminate\Support\Facades\Validator;
+use App\Traits\JsonResponseTrait;
+use App\Services\SubcategoryService;
+use App\Services\CategoryService;
 
 class SubCategoryController extends Controller
 {
+    use JsonResponseTrait;
 
-    public function index()
-    {
-        $subcategories = SubCategory::latest()->paginate(10);
-        return view("admin.subcategory.list", compact("subcategories"));
+    public $subCategoryService;
+    public $categoryService;
+
+    public function __construct(
+
+        SubcategoryService $subCategoryService,
+        CategoryService $categoryService
+
+        ){
+
+        $this->subCategoryService = $subCategoryService;
+        $this->categoryService = $categoryService;
+
     }
+
+    public function index(SubcategoryDataTable $dataTable){
+
+        return $dataTable->render("admin.subcategory.list");
+
+    }
+
     public function create()
     {
-        $categories = Category::orderBy('name', 'ASC')->get();
+        $categories = $this->categoryService->getByOrder();
         return view("admin.subcategory.create", compact("categories"));
     }
 
@@ -32,27 +51,17 @@ class SubCategoryController extends Controller
         ]);
 
         if ($validator->passes()) {
-            SubCategory::create($request->all());
-
-            return response()->json([
-                'status' => true,
-                'redirect' => route('sub-categories.index'),
-                'message' => 'Sub Category created successfully',
-            ]);
+           return $this->subCategoryService->create($request->all());
 
         }else {
-            return response()->json([
-                'status' => false,
-                'errors' => $validator->errors(),
-            ]);
+            return $this->validationErrorResponse(false, $validator->errors());
         }
     }
 
     public function edit($categoryId, Request $request)
     {
-        $subcategory = SubCategory::find($categoryId);
-        $categories = Category::orderBy('name', 'ASC')->get();
-
+        $subcategory = $this->subCategoryService->find($categoryId);
+        $categories = $this->categoryService->getByOrder();
         if (empty($subcategory)) {
             return redirect()->route('sub-categories.index');
         }
@@ -61,15 +70,7 @@ class SubCategoryController extends Controller
 
     public function update(Request $request)
     {
-        $subcategory = SubCategory::where('id', $request->category)->first();
 
-        if (empty($subcategory)) {
-            return response()->json([
-                'status' => false,
-                'notFound' => true,
-                'message' => 'Category not found',
-            ]);
-        }
         $validator = Validator::make($request->all(), [
             "name" => "required",
             "slug" => "required",
@@ -78,37 +79,15 @@ class SubCategoryController extends Controller
         ]);
 
         if ($validator->passes()) {
-            $subcategory->name = $request->name;
-            $subcategory->slug = $request->slug;
-            $subcategory->status = $request->status;
-            $subcategory->showHome = $request->showHome;
-            $subcategory->category_id = $request->category_id;
-            $subcategory->save();
-
-            return response()->json([
-                'status' => true,
-                'redirect' => route('sub-categories.index'),
-                'message' => 'SubCategory updated successfully',
-            ]);
+            return $this->subCategoryService->update($request->category, $request->all());
         } else {
-            return response()->json([
-                'status' => false,
-                'errors' => $validator->errors()
-            ]);
+            return $this->validationErrorResponse(false, $validator->errors());
         }
     }
 
     public function destroy(Request $request, $id)
     {
-        $subcategory = SubCategory::findOrFail($id);
-
-        $subcategory->delete();
-
-        return response()->json([
-            'status' => true,
-            'redirect' => route('sub-categories.index'),
-            'message' => 'Category deleted successfully',
-        ]);
+        return $this->subCategoryService->delete($id);
     }
 }
 

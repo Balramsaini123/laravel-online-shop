@@ -3,19 +3,32 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Services\BrandService;
+use App\Traits\JsonResponseTrait;
+use App\DataTables\BrandDataTable;
 
 class BrandController extends Controller
 {
-    public function index()
-    {
-        $brands = Brand::latest()->paginate(10);
-        return view("admin.brands.list",compact("brands"));
+    use JsonResponseTrait;
+
+    public $brandService;
+
+    public function __construct(BrandService $brandService){
+        $this->brandService = $brandService;
     }
+
+    public function index(BrandDataTable $dataTables){
+
+        return $dataTables->render('admin.brands.list');
+
+    }
+
     public function create(){
+
         return view("admin.brands.create");
+
     }
 
     public function store(Request $request)
@@ -27,43 +40,27 @@ class BrandController extends Controller
         ]);
 
         if ($validator->passes()) {
-            Brand::create($request->all());
 
-            return response()->json([
-                'status' => true,
-                'redirect' => route('brands.index'),
-                'message' => 'Brand created successfully',
-            ]);
+            return $this->brandService->create($request->all());
 
         }else {
-            return response()->json([
-                'status' => false,
-                'errors' => $validator->errors(),
-            ]);
+            return $this->validationErrorResponse(false, $validator->errors());
         }
     }
 
-    public function edit($brandId, Request $request)
-    {
-        $brand = Brand::find($brandId);
+    public function edit($brandId, Request $request){
+
+        $brand = $this->brandService->find($brandId);
 
         if (empty($brand)) {
             return redirect()->route('brands.index');
         }
         return view('admin.brands.edit', compact('brand'));
+
     }
 
     public function update(Request $request)
     {
-        $brand = Brand::where('id', $request->brand)->first();
-
-        if (empty($brand)) {
-            return response()->json([
-                'status' => false,
-                'notFound' => true,
-                'message' => 'Category not found',
-            ]);
-        }
         $validator = Validator::make($request->all(), [
             "name" => "required",
             "slug" => "required",
@@ -71,34 +68,17 @@ class BrandController extends Controller
         ]);
 
         if ($validator->passes()) {
-            $brand->name = $request->name;
-            $brand->slug = $request->slug;
-            $brand->status = $request->status;
-            $brand->save();
 
-            return response()->json([
-                'status' => true,
-                'redirect' => route('brands.index'),
-                'message' => 'Brand updated successfully',
-            ]);
+            return $this->brandService->update($request->brand, $request->all());
+
         } else {
-            return response()->json([
-                'status' => false,
-                'errors' => $validator->errors()
-            ]);
+            return $this->validationErrorResponse(false, $validator->errors());
         }
     }
 
-    public function destroy(Request $request, $id)
-    {
-        $brand = Brand::findOrFail($id);
+    public function destroy(Request $request, $id){
 
-        $brand->delete();
-
-        return response()->json([
-            'status' => true,
-            'redirect' => route('brands.index'),
-            'message' => 'Brand deleted successfully',
-        ]);
+        return $this->brandService->delete($id);
+        
     }
 }

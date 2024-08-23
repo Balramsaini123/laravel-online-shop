@@ -13,7 +13,8 @@ class Category extends Model
         'name',
         'slug',
         'status',
-        'image',
+        'showHome',
+        'image'
     ];
 
 
