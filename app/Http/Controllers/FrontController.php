@@ -15,7 +15,14 @@ class FrontController extends Controller
             $query->where('showHome', 'Yes');
         }])->where("showHome","Yes")->get();
 
-        $featureProducts = Product::where("is_featured","Yes")->where("status","1")->get();
-        return view('front.home',compact("categories","featureProducts"));
+        $featureProducts = Product::where("is_featured","Yes")
+                                    ->orderBy('id','DESC')
+                                    ->take(8)
+                                    ->where("status","1")->get();
+        $latestProducts = Product::orderBy('id','DESC')
+                                    ->where('status','1')
+                                    ->take(8)->get();
+                                    
+        return view('front.home',compact("categories","featureProducts","latestProducts"));
     }
 }

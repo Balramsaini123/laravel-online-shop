@@ -67,8 +67,6 @@ class ProductController extends Controller
         ]);
 
         if ($validator->passes()) {
-           
-            return $this->productService->create($request->all());
 
         } else {
             return $this->validationErrorResponse(false, $validator->errors());
@@ -84,12 +82,7 @@ class ProductController extends Controller
             return redirect()->route('products.index')->with('error', 'Product not found');
         }
 
-        $productImages = $this->productService->getProductImages($product->id);
-        $subCategories = $this->subcategoryService->getSubCategories($product->category_id);
-        $categories = $this->categoryService->getByOrder();
-        $brands = $this->brandService->getByOrder();
 
-        return view("admin.products.edit", compact("product", "categories", "brands", "subCategories", "productImages"));
     }
 
     public function update(Request $request, $id)
@@ -111,7 +104,7 @@ class ProductController extends Controller
         $validator = Validator::make($request->all(), $rules);
 
         if ($validator->passes()) {
-            return $this->productService->update($id, $request->all());
+
         } else {
             return $this->validationErrorResponse(false, $validator->errors());
         }
@@ -120,5 +113,24 @@ class ProductController extends Controller
     public function destroy($id)
     {
         return $this->productService->delete($id);
+    }
+
+    public function getProducts(Request $request)
+    {
+        $tempProduct = [];
+        if($request->term != ""){
+            $products = Product::where('title', 'like', '%' . $request->term . '%')->get();
+
+            if($products != null){
+                foreach ($products as $product) {
+                    $tempProduct[] = array('id' => $product->id, 'text' => $product->title);
+                }
+            }
+        }
+
+        return response()->json([
+            'tags' => $tempProduct,
+            'status' => true,
+        ]);
     }
 }
