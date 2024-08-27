@@ -11,6 +11,11 @@ use App\Services\BrandService;
 use App\Services\CategoryService;
 use App\Services\SubcategoryService;
 use App\Traits\JsonResponseTrait;
+use App\Models\Product;
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\SubCategory;
+use App\Models\ProductImage;
 
 class ProductController extends Controller
 {
@@ -54,7 +59,7 @@ class ProductController extends Controller
         ]);
 
         if ($validator->passes()) {
-
+            return $this->productService->create($request->all());
         } else {
             return $this->validationErrorResponse(false, $validator->errors());
         }
@@ -65,9 +70,21 @@ class ProductController extends Controller
         $product = $this->productService->find($id);
 
         if (empty($product)) {
-
             return redirect()->route('products.index')->with('error', 'Product not found');
         }
+
+        $productImages = ProductImage::where('product_id', $product->id)->get();
+        $subCategories = SubCategory::where('category_id', $product->category_id)->get();
+        $categories = Category::orderBy('name', 'ASC')->get();
+        $brands = Brand::orderBy('name', 'ASC')->get();
+
+        $relatedProducts = [];
+        //fetch related product
+        if($product->related_products != ''){
+            $productArray = explode(',', $product->related_products);
+            $relatedProducts = Product::whereIn('id', $productArray)->with('product_images')->get();
+        }
+        return view("admin.products.edit", compact("product", "categories", "brands", "subCategories", "productImages", "relatedProducts"));
 
 
     }
@@ -91,7 +108,7 @@ class ProductController extends Controller
         $validator = Validator::make($request->all(), $rules);
 
         if ($validator->passes()) {
-
+            return $this->productService->update($id, $request->all());
         } else {
             return $this->validationErrorResponse(false, $validator->errors());
         }

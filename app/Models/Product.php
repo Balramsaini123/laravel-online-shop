@@ -23,7 +23,10 @@ class Product extends Model
         'barcode',
         'track_qty',
         'qty',
-        'status'
+        'status',
+        'related_products',
+        'short_description',
+        'shipping_returns'
     ];
 
     public function product_images()
