@@ -174,7 +174,7 @@
                                 </div>
                                 <div class="mb-3">
                                     <label for="sub_category">Sub category</label>
-                                    <select name="sub_category" id="sub_category" class="form-control">
+                                    <select name="sub_category_id" id="sub_category" class="form-control">
                                         <option value="">Select a Sub Category</option>
                                     </select>
                                 </div>
@@ -184,7 +184,7 @@
                             <div class="card-body">
                                 <h2 class="h4 mb-3">Product brand</h2>
                                 <div class="mb-3">
-                                    <select name="brand" id="brand" class="form-control">
+                                    <select name="brand_id" id="brand" class="form-control">
                                         <option value="">Select a Brand</option>
                                         @if ($brands->isNotEmpty())
                                             @foreach ($brands as $brand)
@@ -283,7 +283,9 @@
                     if (response.status === true) {
                         $(".error").removeClass('invalid-feedback').html("");
                         $("input[type='text'], select, input[type='number']").removeClass('is-invalid');
-                        window.location.href = "{{ route('products.index') }}";
+                         // Store the flash message in sessionStorage
+                        sessionStorage.setItem('flashMessage', response.message);
+                        window.location.href = response.redirect;
                     } else {
                         var errors = response.errors;
                         $(".error").removeClass('invalid-feedback').html("");

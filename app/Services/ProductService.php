@@ -21,6 +21,9 @@ class ProductService extends BaseService {
 
     public function create(array $data){
         
+        if(!empty($data['related_products'])){
+            $data['related_products'] = implode(',', $data['related_products']);
+        }
         $product = $this->repository->create($data);
 
         //Gallery pics
@@ -35,6 +38,9 @@ class ProductService extends BaseService {
 
     public function update($id, array $data){
 
+        if(!empty($data['related_products'])){
+            $data['related_products'] = implode(',', $data['related_products']);
+        }
         $this->repository->update($id, $data);
         Session::flash('flashMessage', 'Product updated successfully');
 

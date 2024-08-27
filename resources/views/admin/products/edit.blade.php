@@ -319,7 +319,9 @@
                     if (response.status === true) {
                         $(".error").removeClass('invalid-feedback').html("");
                         $("input[type='text'], select, input[type='number']").removeClass('is-invalid');
-                        window.location.href = "{{ route('products.index') }}";
+                        sessionStorage.setItem('flashMessage', response.message);
+                        window.location.href = response.redirect;
+                        // window.location.href = "{{ route('products.index') }}";
                     } else {
                         var errors = response.errors;
                         $(".error").removeClass('invalid-feedback').html("");
