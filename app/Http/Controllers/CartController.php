@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Product;
 use Gloudemans\Shoppingcart\Facades\Cart;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use App\Models\Country;
 
 class CartController extends Controller
 {
@@ -99,5 +101,31 @@ class CartController extends Controller
             'status' => true,
             'message' => 'Item removed successfully',
         ]);
+    }
+
+    public function checkout()
+    {
+        $categories = Category::orderBy("name", "ASC")->with(['sub_categories' => function ($query) {
+            $query->where('showHome', 'Yes');
+        }])->where("showHome", "Yes")->get();
+
+        if (Cart::count() == 0) {
+            return redirect()->route('front.cart');
+        }
+
+        if (Auth::check() == false) {
+
+            if (!session()->has('url.intended')) {
+                session(['url.intended' => url()->current()]);
+            }
+            
+            return redirect()->route('account.login');
+        }
+
+        session()->forget('url.intended');
+
+        $cartContent = Cart::content();
+        $countries = Country::orderBy("name", "ASC")->get();
+        return view("front.checkout", compact("categories","cartContent","countries"));
     }
 }
